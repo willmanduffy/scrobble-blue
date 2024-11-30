@@ -52,7 +52,7 @@ describe("BlueSky", () => {
 
       vi.mocked(agent.login).mockResolvedValueOnce(mockResponse);
 
-      const bluesky = await BlueSky.createAgent(mockEnv);
+      const bluesky = await BlueSky.retrieveAgent(mockEnv);
 
       expect(agent.login).toHaveBeenCalledWith({
         identifier: mockEnv.BSKY_USERNAME,
@@ -64,7 +64,7 @@ describe("BlueSky", () => {
     it("should throw if login fails", async () => {
       vi.mocked(agent.login).mockRejectedValueOnce(new Error("Login failed"));
 
-      await expect(BlueSky.createAgent(mockEnv)).rejects.toThrow(
+      await expect(BlueSky.retrieveAgent(mockEnv)).rejects.toThrow(
         "Login failed",
       );
     });
@@ -91,7 +91,7 @@ describe("BlueSky", () => {
         cid: "test-cid",
       });
 
-      const bluesky = await BlueSky.createAgent(mockEnv);
+      const bluesky = await BlueSky.retrieveAgent(mockEnv);
       const message = "Test message";
 
       await bluesky.postMessage(message);
@@ -132,7 +132,7 @@ describe("BlueSky", () => {
         data: mockProfile,
       });
 
-      const bluesky = await BlueSky.createAgent(mockEnv);
+      const bluesky = await BlueSky.retrieveAgent(mockEnv);
       const profile = await bluesky.getProfile();
 
       expect(agent.getProfile).toHaveBeenCalledWith({
@@ -160,7 +160,7 @@ describe("BlueSky", () => {
 
       vi.mocked(agent.upsertProfile).mockResolvedValue();
 
-      const bluesky = await BlueSky.createAgent(mockEnv);
+      const bluesky = await BlueSky.retrieveAgent(mockEnv);
       const newDescription = "New description";
 
       await bluesky.updateDescription(newDescription);
@@ -187,7 +187,7 @@ describe("BlueSky", () => {
         new Error("Update failed"),
       );
 
-      const bluesky = await BlueSky.createAgent(mockEnv);
+      const bluesky = await BlueSky.retrieveAgent(mockEnv);
       await expect(bluesky.updateDescription("test")).rejects.toThrow(
         "Update failed",
       );

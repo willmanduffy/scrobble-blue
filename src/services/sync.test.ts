@@ -27,7 +27,7 @@ describe("sync", () => {
     });
 
     vi.mocked(LastFM.prototype.getLatestSong).mockResolvedValue(mockTrack);
-    vi.mocked(BlueSky.createAgent).mockResolvedValue({
+    vi.mocked(BlueSky.retrieveAgent).mockResolvedValue({
       getProfile: mockGetProfile,
       updateDescription: mockUpdateDescription,
     } as unknown as BlueSky);
@@ -35,7 +35,7 @@ describe("sync", () => {
     await sync(mockEnv);
 
     expect(LastFM.prototype.getLatestSong).toHaveBeenCalled();
-    expect(BlueSky.createAgent).toHaveBeenCalledWith(mockEnv);
+    expect(BlueSky.retrieveAgent).toHaveBeenCalledWith(mockEnv);
     expect(mockUpdateDescription).toHaveBeenCalledWith(
       'Test description\n\n🎵 Now Playing: "Test Track" by Test Artist',
     );
@@ -47,7 +47,7 @@ describe("sync", () => {
     await sync(mockEnv);
 
     expect(LastFM.prototype.getLatestSong).toHaveBeenCalled();
-    expect(BlueSky.createAgent).not.toHaveBeenCalled();
+    expect(BlueSky.retrieveAgent).not.toHaveBeenCalled();
   });
 
   it("should preserve existing description and replace Now Playing", async () => {
@@ -66,7 +66,7 @@ describe("sync", () => {
     });
 
     vi.mocked(LastFM.prototype.getLatestSong).mockResolvedValue(mockTrack);
-    vi.mocked(BlueSky.createAgent).mockResolvedValue({
+    vi.mocked(BlueSky.retrieveAgent).mockResolvedValue({
       getProfile: mockGetProfile,
       updateDescription: mockUpdateDescription,
     } as unknown as BlueSky);
@@ -87,13 +87,13 @@ describe("sync", () => {
     };
 
     vi.mocked(LastFM.prototype.getLatestSong).mockResolvedValue(mockTrack);
-    vi.mocked(BlueSky.createAgent).mockRejectedValue(
+    vi.mocked(BlueSky.retrieveAgent).mockRejectedValue(
       new Error("BlueSky error"),
     );
 
     await sync(mockEnv);
 
     expect(LastFM.prototype.getLatestSong).toHaveBeenCalled();
-    expect(BlueSky.createAgent).toHaveBeenCalled();
+    expect(BlueSky.retrieveAgent).toHaveBeenCalled();
   });
 });
