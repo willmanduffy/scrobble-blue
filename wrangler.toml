@@ -1,0 +1,6 @@
+name = "bluesky-lastfm"
+main = "src/index.ts"
+compatibility_date = "2024-11-30"
+
+[triggers]
+crons = [ "* * * * *" ]
