@@ -12,20 +12,9 @@ vi.mock("@imikailoby/lastfm-ts", () => ({
 
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { LastFM } from "./lastfm";
-import { RecentTracksResponse } from "./lastfm.types";
+import { RecentTrack, RecentTracksResponse } from "./lastfm.types";
 import { LastFm } from "@imikailoby/lastfm-ts";
 import { mockEnv } from "../../tests/fixtures/env";
-
-// Mock console.error to suppress expected error logs in tests
-const originalConsoleError = console.error;
-
-beforeEach(() => {
-  console.error = vi.fn();
-});
-
-afterEach(() => {
-  console.error = originalConsoleError;
-});
 
 describe("LastFM", () => {
   let lastfm: LastFM;
@@ -37,7 +26,7 @@ describe("LastFM", () => {
 
   describe("getLatestSong", () => {
     it("should fetch latest song successfully", async () => {
-      const mockTrack = {
+      const mockTrack: RecentTrack = {
         artist: {
           "#text": "Test Artist",
           mbid: "test-mbid",
@@ -109,7 +98,7 @@ describe("LastFM", () => {
     });
 
     it("should handle currently playing track", async () => {
-      const mockTrack = {
+      const mockTrack: RecentTrack = {
         artist: {
           "#text": "Test Artist",
           mbid: "test-mbid",
