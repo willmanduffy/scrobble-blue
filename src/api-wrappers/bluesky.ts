@@ -15,25 +15,6 @@ export class BlueSky {
     return bluesky;
   }
 
-  private async login(username: string, password: string): Promise<void> {
-    await this.agent.login({
-      identifier: username,
-      password: password,
-    });
-  }
-
-  async postMessage(text: string): Promise<void> {
-    try {
-      await this.agent.post({
-        text,
-        createdAt: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error("Failed to post message:", error);
-      throw error;
-    }
-  }
-
   async getProfile(): Promise<
     AppBskyActorDefs.ProfileViewDetailed | undefined
   > {
@@ -53,6 +34,18 @@ export class BlueSky {
     }
   }
 
+  async postMessage(text: string): Promise<void> {
+    try {
+      await this.agent.post({
+        text,
+        createdAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Failed to post message:", error);
+      throw error;
+    }
+  }
+
   async updateDescription(description: string): Promise<void> {
     try {
       await this.agent.upsertProfile((existing) => ({
@@ -63,5 +56,12 @@ export class BlueSky {
       console.error("Failed to update profile:", error);
       throw error;
     }
+  }
+
+  private async login(username: string, password: string): Promise<void> {
+    await this.agent.login({
+      identifier: username,
+      password: password,
+    });
   }
 }
