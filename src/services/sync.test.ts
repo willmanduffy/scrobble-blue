@@ -2,18 +2,12 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import { sync } from "./sync";
 import { LastFM } from "../api-wrappers/lastfm";
 import { BlueSky } from "../api-wrappers/bluesky";
+import { mockEnv } from "../../tests/fixtures/env";
 
 vi.mock("../api-wrappers/lastfm");
 vi.mock("../api-wrappers/bluesky");
 
 describe("sync", () => {
-  const mockEnv = {
-    LASTFM_API_KEY: "test-api-key",
-    LASTFM_USERNAME: "test-user",
-    BSKY_USERNAME: "test-bsky",
-    BSKY_PASSWORD: "test-pass",
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
   });

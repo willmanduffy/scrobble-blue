@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BlueSky } from './bluesky';
 import { AtpAgent, ComAtprotoServerCreateSession } from '@atproto/api';
+import { mockEnv } from '../../tests/fixtures/env';
 
 type CreateSessionResponse = ComAtprotoServerCreateSession.Response;
 
@@ -24,17 +25,11 @@ vi.mock('@atproto/api', () => {
 });
 
 describe('BlueSky', () => {
-  const mockEnv = {
-    BSKY_USERNAME: 'test-user',
-    BSKY_PASSWORD: 'test-pass',
-    BSKY_SERVICE: 'https://test.social'
-  };
-
   let agent: AtpAgent;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    agent = new AtpAgent({ service: mockEnv.BSKY_SERVICE });
+    agent = new AtpAgent({ service: mockEnv.BSKY_SERVICE ?? "" });
   });
 
   const mockHeaders: HeadersMap = {
