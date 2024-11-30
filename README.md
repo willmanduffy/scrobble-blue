@@ -5,6 +5,7 @@ Updates your Bluesky profile description with your currently playing track from 
 ## Prerequisites
 
 1. **Cloudflare Account**
+
 This is a Cloudflare worker, so you'll need an account.
 
    - Sign up at [Cloudflare](https://dash.cloudflare.com/sign-up)
