@@ -2,6 +2,8 @@
 
 Updates your Bluesky profile description with your currently playing track from Last.fm.
 
+![Screenshot](https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:wnakkpxj4ndea7yetar7y7zq/bafkreibcfaffmp4345plad6kj2qsqxvc5wupaq4k5tjbrzkfpmuukhrlnm@jpeg)
+
 ## Prerequisites
 
 1. **Cloudflare Account**
