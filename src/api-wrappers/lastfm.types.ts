@@ -1,18 +1,21 @@
 // Data Types
 export interface RecentTrack {
+  name: string;
   artist: {
     "#text": string;
-    mbid: string;
+    mbid?: string;
   };
-  name: string;
   album: {
     "#text": string;
-    mbid: string;
+    mbid?: string;
   };
   url: string;
   date?: {
     uts: string;
-    "#text": string;
+    "#text": string | number;
+  };
+  "@attr"?: {
+    nowplaying: string;
   };
 }
 
