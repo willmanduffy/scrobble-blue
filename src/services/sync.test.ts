@@ -43,7 +43,7 @@ describe("sync", () => {
     expect(LastFM.prototype.getLatestSong).toHaveBeenCalled();
     expect(BlueSky.createAgent).toHaveBeenCalledWith(mockEnv);
     expect(mockUpdateDescription).toHaveBeenCalledWith(
-      "Test description\n\n🎵 Now Playing: Test Track by Test Artist"
+      "Test description\n\n🎵 Now Playing: \"Test Track\" by Test Artist"
     );
   });
 
@@ -67,7 +67,7 @@ describe("sync", () => {
     const mockUpdateDescription = vi.fn();
     const mockGetProfile = vi.fn().mockResolvedValue({
       did: "test-did",
-      description: "Test description\n🎵 Now Playing: Old Track by Old Artist",
+      description: "Test description\n🎵 Now Playing: \"Old Track\" by Old Artist",
     });
 
     vi.mocked(LastFM.prototype.getLatestSong).mockResolvedValue(mockTrack);
@@ -79,7 +79,7 @@ describe("sync", () => {
     await sync(mockEnv);
 
     expect(mockUpdateDescription).toHaveBeenCalledWith(
-      "Test description\n\n🎵 Now Playing: Test Track by Test Artist"
+      "Test description\n\n🎵 Now Playing: \"Test Track\" by Test Artist"
     );
   });
 
