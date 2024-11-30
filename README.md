@@ -1,6 +1,6 @@
-# Bluesky LastFM Integration
+# Scrobble Blue
 
-Updates your Bluesky profile description with your currently playing track from Last.fm.
+Update your Bluesky profile description with your currently playing track from Last.fm. This application requires a Bluesky account and Last.fm API key and for you to run your own Cloudflare Worker. You are able to use the free tier of Cloudflare for this application.
 
 ![Screenshot](https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:wnakkpxj4ndea7yetar7y7zq/bafkreibcfaffmp4345plad6kj2qsqxvc5wupaq4k5tjbrzkfpmuukhrlnm@jpeg)
 
@@ -36,15 +36,27 @@ This is a Cloudflare worker, so you'll need an account.
    npm install
    ```
 
-3. Configure environment variables:
+3. Create a KV namespace:
+   - Go to your [Cloudflare Dashboard](https://dash.cloudflare.com)
+   - Navigate to Workers & Pages → KV
+   - Click "Create a namespace"
+   - Name it `BLUESKY_SESSION_STORAGE`
+   - Copy the ID of the newly created namespace
+
+4. Configure environment variables:
    ```bash
    cp .dev.vars.example .dev.vars
    cp wrangler.toml.example wrangler.toml
    ```
 
-   Fill out `.dev.vars` with your credentials and modify the KV_ID in `wrangler.toml` to your Bluesky session storage KV namespace ID.
+   Fill out `.dev.vars` with your credentials and replace the KV_ID in `wrangler.toml` with your copied KV namespace ID. It should look like this:
+   ```toml
+   kv_namespaces = [
+     { binding = "BLUESKY_SESSION_STORAGE", id = "your-kv-namespace-id" }
+   ]
+   ```
 
-4. Deploy secrets to Cloudflare:
+5. Deploy secrets to Cloudflare:
 
    ```bash
    wrangler secret put BSKY_USERNAME
@@ -54,7 +66,7 @@ This is a Cloudflare worker, so you'll need an account.
    wrangler secret put LASTFM_USERNAME
    ```
 
-5. Deploy the worker:
+6. Deploy the worker:
    ```bash
    wrangler deploy
    ```

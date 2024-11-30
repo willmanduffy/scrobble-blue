@@ -8,7 +8,7 @@ export const sync = async (env: Env) => {
 
   if (latestSong) {
     try {
-      const bluesky = await BlueSky.createAgent(env);
+      const bluesky = await BlueSky.retrieveAgent(env);
       const profile = await bluesky.getProfile();
 
       const existingDescription = getBaseDescription(

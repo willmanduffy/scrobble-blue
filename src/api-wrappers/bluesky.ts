@@ -1,16 +1,45 @@
-import { AtpAgent, AppBskyActorDefs } from "@atproto/api";
+import {
+  AtpAgent,
+  AppBskyActorDefs,
+  AtpSessionEvent,
+  AtpSessionData,
+} from "@atproto/api";
+
 import { Env } from "../types";
+
+const SESSION_KEY = "session";
 
 export class BlueSky {
   private agent: AtpAgent;
 
-  constructor(service = "https://bsky.social") {
-    this.agent = new AtpAgent({ service });
+  constructor(env: Env) {
+    this.agent = new AtpAgent({
+      service: env.BSKY_SERVICE ?? "https://bsky.social",
+      persistSession: async (
+        _: AtpSessionEvent,
+        sessionData?: AtpSessionData,
+      ) => {
+        await env.BLUESKY_SESSION_STORAGE.put(
+          SESSION_KEY,
+          JSON.stringify(sessionData),
+        );
+      },
+    });
   }
 
-  static async createAgent(env: Env): Promise<BlueSky> {
-    const bluesky = new BlueSky(env.BSKY_SERVICE);
-    await bluesky.login(env.BSKY_USERNAME, env.BSKY_PASSWORD);
+  static async retrieveAgent(env: Env): Promise<BlueSky> {
+    const bluesky = new BlueSky(env);
+
+    const existingSessionData =
+      await env.BLUESKY_SESSION_STORAGE.get(SESSION_KEY);
+
+    if (existingSessionData) {
+      const sessionData = JSON.parse(existingSessionData);
+
+      await bluesky.agent.resumeSession(sessionData);
+    } else {
+      await bluesky.login(env.BSKY_USERNAME, env.BSKY_PASSWORD);
+    }
 
     return bluesky;
   }

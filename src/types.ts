@@ -1,4 +1,5 @@
 export interface Env {
+  BLUESKY_SESSION_STORAGE: KVNamespace;
   BSKY_USERNAME: string;
   BSKY_PASSWORD: string;
   BSKY_SERVICE?: string;
