@@ -28,8 +28,6 @@ afterEach(() => {
 });
 
 describe("LastFM", () => {
-  
-
   let lastfm: LastFM;
 
   beforeEach(() => {

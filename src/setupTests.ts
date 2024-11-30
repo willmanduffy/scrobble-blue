@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, vi } from 'vitest';
+import { beforeEach, afterEach, vi } from "vitest";
 
 const originalConsoleError = console.error;
 
@@ -8,4 +8,4 @@ beforeEach(() => {
 
 afterEach(() => {
   console.error = originalConsoleError;
-}); 
+});

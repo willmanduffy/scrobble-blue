@@ -1,7 +1,6 @@
-import { LastFm } from '@imikailoby/lastfm-ts';
-import { RecentTrack, RecentTracksResponse } from './lastfm.types';
-import { Env } from '../types';
-
+import { LastFm } from "@imikailoby/lastfm-ts";
+import { RecentTrack, RecentTracksResponse } from "./lastfm.types";
+import { Env } from "../types";
 
 export class LastFM {
   private client: LastFm;
@@ -14,10 +13,10 @@ export class LastFM {
 
   async getLatestSong(): Promise<RecentTrack | undefined> {
     try {
-      const response = await this.client.user.getRecentTracks({
+      const response = (await this.client.user.getRecentTracks({
         user: this.username,
-        limit: '1'
-      }) as RecentTracksResponse;
+        limit: "1",
+      })) as RecentTracksResponse;
 
       if (!response.recenttracks?.track?.length) {
         return;
@@ -25,7 +24,7 @@ export class LastFM {
 
       return response.recenttracks.track[0];
     } catch (error) {
-      console.error('Failed to fetch latest song:', error);
+      console.error("Failed to fetch latest song:", error);
       return;
     }
   }

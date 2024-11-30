@@ -17,7 +17,7 @@ describe("sync", () => {
       name: "Test Track",
       artist: { "#text": "Test Artist", mbid: "" },
       album: { "#text": "Test Album", mbid: "" },
-      url: "https://test.url"
+      url: "https://test.url",
     };
 
     const mockUpdateDescription = vi.fn();
@@ -37,7 +37,7 @@ describe("sync", () => {
     expect(LastFM.prototype.getLatestSong).toHaveBeenCalled();
     expect(BlueSky.createAgent).toHaveBeenCalledWith(mockEnv);
     expect(mockUpdateDescription).toHaveBeenCalledWith(
-      "Test description\n\n🎵 Now Playing: \"Test Track\" by Test Artist"
+      'Test description\n\n🎵 Now Playing: "Test Track" by Test Artist',
     );
   });
 
@@ -55,13 +55,14 @@ describe("sync", () => {
       name: "Test Track",
       artist: { "#text": "Test Artist", mbid: "" },
       album: { "#text": "Test Album", mbid: "" },
-      url: "https://test.url"
+      url: "https://test.url",
     };
 
     const mockUpdateDescription = vi.fn();
     const mockGetProfile = vi.fn().mockResolvedValue({
       did: "test-did",
-      description: "Test description\n🎵 Now Playing: \"Old Track\" by Old Artist",
+      description:
+        'Test description\n🎵 Now Playing: "Old Track" by Old Artist',
     });
 
     vi.mocked(LastFM.prototype.getLatestSong).mockResolvedValue(mockTrack);
@@ -73,7 +74,7 @@ describe("sync", () => {
     await sync(mockEnv);
 
     expect(mockUpdateDescription).toHaveBeenCalledWith(
-      "Test description\n\n🎵 Now Playing: \"Test Track\" by Test Artist"
+      'Test description\n\n🎵 Now Playing: "Test Track" by Test Artist',
     );
   });
 
@@ -82,15 +83,17 @@ describe("sync", () => {
       name: "Test Track",
       artist: { "#text": "Test Artist", mbid: "" },
       album: { "#text": "Test Album", mbid: "" },
-      url: "https://test.url"
+      url: "https://test.url",
     };
 
     vi.mocked(LastFM.prototype.getLatestSong).mockResolvedValue(mockTrack);
-    vi.mocked(BlueSky.createAgent).mockRejectedValue(new Error("BlueSky error"));
+    vi.mocked(BlueSky.createAgent).mockRejectedValue(
+      new Error("BlueSky error"),
+    );
 
     await sync(mockEnv);
 
     expect(LastFM.prototype.getLatestSong).toHaveBeenCalled();
     expect(BlueSky.createAgent).toHaveBeenCalled();
   });
-}); 
+});

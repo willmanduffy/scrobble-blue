@@ -1,10 +1,10 @@
-import { AtpAgent, AppBskyActorDefs } from '@atproto/api';
-import { Env } from '../types';
+import { AtpAgent, AppBskyActorDefs } from "@atproto/api";
+import { Env } from "../types";
 
 export class BlueSky {
   private agent: AtpAgent;
 
-  constructor(service = 'https://bsky.social') {
+  constructor(service = "https://bsky.social") {
     this.agent = new AtpAgent({ service });
   }
 
@@ -29,24 +29,26 @@ export class BlueSky {
         createdAt: new Date().toISOString(),
       });
     } catch (error) {
-      console.error('Failed to post message:', error);
+      console.error("Failed to post message:", error);
       throw error;
     }
   }
 
-  async getProfile(): Promise<AppBskyActorDefs.ProfileViewDetailed | undefined> {
+  async getProfile(): Promise<
+    AppBskyActorDefs.ProfileViewDetailed | undefined
+  > {
     try {
       const response = await this.agent.getProfile({
-        actor: this.agent.session?.did || '',
+        actor: this.agent.session?.did || "",
       });
-      
+
       if (!response.success) {
-        throw new Error('Failed to fetch profile');
+        throw new Error("Failed to fetch profile");
       }
 
       return response.data;
     } catch (error) {
-      console.error('Failed to get profile:', error);
+      console.error("Failed to get profile:", error);
       return undefined;
     }
   }
@@ -58,7 +60,7 @@ export class BlueSky {
         description,
       }));
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.error("Failed to update profile:", error);
       throw error;
     }
   }

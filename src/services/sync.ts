@@ -11,9 +11,11 @@ export const sync = async (env: Env) => {
       const bluesky = await BlueSky.createAgent(env);
       const profile = await bluesky.getProfile();
 
-      const existingDescription = getBaseDescription(profile?.description || "");
+      const existingDescription = getBaseDescription(
+        profile?.description || "",
+      );
 
-      const newDescription = `${existingDescription}\n\n🎵 Now Playing: "${latestSong.name}" by ${latestSong.artist['#text']}`;
+      const newDescription = `${existingDescription}\n\n🎵 Now Playing: "${latestSong.name}" by ${latestSong.artist["#text"]}`;
 
       await bluesky.updateDescription(newDescription);
     } catch (error) {
@@ -25,7 +27,7 @@ export const sync = async (env: Env) => {
 };
 
 const getBaseDescription = (description: string): string => {
-  const nowPlayingIndex = description.indexOf('🎵 Now Playing:');
+  const nowPlayingIndex = description.indexOf("🎵 Now Playing:");
 
   if (nowPlayingIndex === -1) {
     return description.trim();
