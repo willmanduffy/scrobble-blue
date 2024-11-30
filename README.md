@@ -39,9 +39,10 @@ This is a Cloudflare worker, so you'll need an account.
 3. Configure environment variables:
    ```bash
    cp .dev.vars.example .dev.vars
+   cp wrangler.toml.example wrangler.toml
    ```
 
-   Fill out `.dev.vars` with your credentials.
+   Fill out `.dev.vars` with your credentials and modify the KV_ID in `wrangler.toml` to your Bluesky session storage KV namespace ID.
 
 4. Deploy secrets to Cloudflare:
 
