@@ -10,5 +10,8 @@
   "dependencies": {
     "@atproto/api": "^0.13.18",
     "@imikailoby/lastfm-ts": "^2.0.1"
+  },
+  "scripts": {
+    "test": "vitest run"
   }
 }
