@@ -1,4 +1,4 @@
-import { Env } from "..";
+import { Env } from "../types";
 import { BlueSky } from "../api-wrappers/bluesky";
 import { LastFM } from "../api-wrappers/lastfm";
 

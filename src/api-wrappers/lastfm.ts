@@ -1,15 +1,13 @@
 import { LastFm } from '@imikailoby/lastfm-ts';
 import { RecentTrack, RecentTracksResponse } from './lastfm.types';
+import { Env } from '../types';
 
 
 export class LastFM {
   private client: LastFm;
   private username: string;
 
-  constructor(env: {
-    LASTFM_API_KEY: string;
-    LASTFM_USERNAME: string;
-  }) {
+  constructor(env: Env) {
     this.client = new LastFm(env.LASTFM_API_KEY);
     this.username = env.LASTFM_USERNAME;
   }

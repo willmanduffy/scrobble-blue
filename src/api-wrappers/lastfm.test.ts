@@ -14,6 +14,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { LastFM } from "./lastfm";
 import { RecentTracksResponse } from "./lastfm.types";
 import { LastFm } from "@imikailoby/lastfm-ts";
+import { mockEnv } from "../../tests/fixtures/env";
 
 // Mock console.error to suppress expected error logs in tests
 const originalConsoleError = console.error;
@@ -27,10 +28,7 @@ afterEach(() => {
 });
 
 describe("LastFM", () => {
-  const mockEnv = {
-    LASTFM_API_KEY: "test-api-key",
-    LASTFM_USERNAME: "test-user",
-  };
+  
 
   let lastfm: LastFM;
 

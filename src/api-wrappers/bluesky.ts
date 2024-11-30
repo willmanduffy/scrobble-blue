@@ -1,4 +1,5 @@
 import { AtpAgent, AppBskyActorDefs } from '@atproto/api';
+import { Env } from '../types';
 
 export class BlueSky {
   private agent: AtpAgent;
@@ -7,11 +8,7 @@ export class BlueSky {
     this.agent = new AtpAgent({ service });
   }
 
-  static async createAgent(env: {
-    BSKY_USERNAME: string;
-    BSKY_PASSWORD: string;
-    BSKY_SERVICE?: string;
-  }): Promise<BlueSky> {
+  static async createAgent(env: Env): Promise<BlueSky> {
     const bluesky = new BlueSky(env.BSKY_SERVICE);
     await bluesky.login(env.BSKY_USERNAME, env.BSKY_PASSWORD);
 
