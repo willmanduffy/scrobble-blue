@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { BlueSky } from "./bluesky";
 import { AtpAgent, ComAtprotoServerCreateSession } from "@atproto/api";
 import { mockEnv } from "../../tests/fixtures/env";
@@ -12,6 +12,7 @@ vi.mock("@atproto/api", () => {
   const mockGetProfile = vi.fn();
   const mockUpsertProfile = vi.fn();
   const mockLogin = vi.fn();
+  const mockResumeSession = vi.fn();
 
   return {
     AtpAgent: vi.fn(() => ({
@@ -19,6 +20,7 @@ vi.mock("@atproto/api", () => {
       getProfile: mockGetProfile,
       upsertProfile: mockUpsertProfile,
       login: mockLogin,
+      resumeSession: mockResumeSession,
       session: { did: "test-did" },
     })),
   };
@@ -29,6 +31,7 @@ describe("BlueSky", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
     agent = new AtpAgent({ service: mockEnv.BSKY_SERVICE ?? "" });
   });
 
@@ -36,9 +39,44 @@ describe("BlueSky", () => {
     "content-type": "application/json; charset=utf-8",
   };
 
-  describe("createAgent", () => {
-    it("should create an agent and login successfully", async () => {
-      const mockResponse: CreateSessionResponse = {
+  describe("retrieveAgent", () => {
+    it("should throw if login fails", async () => {
+      vi.mocked(agent.login).mockRejectedValueOnce(new Error("Login failed"));
+
+      await expect(BlueSky.retrieveAgent(mockEnv)).rejects.toThrow(
+        "Login failed",
+      );
+    });
+
+    it("should resume session if valid session exists in KV", async () => {
+      const mockSession = {
+        did: "test-did",
+        handle: "test.handle",
+        email: "test@example.com",
+        accessJwt: "test-jwt",
+        refreshJwt: "test-refresh-jwt",
+      };
+
+      vi.mocked(mockEnv.BLUESKY_SESSION_STORAGE.get).mockResolvedValueOnce(
+        JSON.stringify(mockSession) as any,
+      );
+
+      const bluesky = await BlueSky.retrieveAgent(mockEnv);
+
+      expect(mockEnv.BLUESKY_SESSION_STORAGE.get).toHaveBeenCalledWith(
+        "session",
+      );
+      expect(agent.resumeSession).toHaveBeenCalledWith(mockSession);
+      expect(agent.login).not.toHaveBeenCalled();
+      expect(bluesky).toBeInstanceOf(BlueSky);
+    });
+
+    it("should login if no session exists in KV", async () => {
+      vi.mocked(mockEnv.BLUESKY_SESSION_STORAGE.get).mockResolvedValueOnce(
+        null,
+      );
+
+      const mockLoginResponse = {
         success: true,
         headers: mockHeaders,
         data: {
@@ -50,23 +88,20 @@ describe("BlueSky", () => {
         },
       };
 
-      vi.mocked(agent.login).mockResolvedValueOnce(mockResponse);
+      vi.mocked(agent.login).mockResolvedValueOnce(mockLoginResponse);
 
       const bluesky = await BlueSky.retrieveAgent(mockEnv);
+
+      expect(mockEnv.BLUESKY_SESSION_STORAGE.get).toHaveBeenCalledWith(
+        "session",
+      );
 
       expect(agent.login).toHaveBeenCalledWith({
         identifier: mockEnv.BSKY_USERNAME,
         password: mockEnv.BSKY_PASSWORD,
       });
+
       expect(bluesky).toBeInstanceOf(BlueSky);
-    });
-
-    it("should throw if login fails", async () => {
-      vi.mocked(agent.login).mockRejectedValueOnce(new Error("Login failed"));
-
-      await expect(BlueSky.retrieveAgent(mockEnv)).rejects.toThrow(
-        "Login failed",
-      );
     });
   });
 
