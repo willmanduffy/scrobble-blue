@@ -6,6 +6,8 @@ import {
 } from "@atproto/api";
 
 import { Env } from "../types";
+import { RateLimitError } from "../errors/rate-limit-error";
+import { BlueskyRateLimitExceededError } from "../types/bluesky";
 
 const SESSION_KEY = "session";
 
@@ -28,20 +30,30 @@ export class BlueSky {
   }
 
   static async retrieveAgent(env: Env): Promise<BlueSky> {
-    const bluesky = new BlueSky(env);
+    try {
+      const bluesky = new BlueSky(env);
 
-    const existingSessionData =
-      await env.BLUESKY_SESSION_STORAGE.get(SESSION_KEY);
+      const existingSessionData =
+        await env.BLUESKY_SESSION_STORAGE.get(SESSION_KEY);
 
-    if (existingSessionData) {
-      const sessionData = JSON.parse(existingSessionData);
+      if (existingSessionData) {
+        const sessionData = JSON.parse(existingSessionData);
 
-      await bluesky.agent.resumeSession(sessionData);
-    } else {
-      await bluesky.login(env.BSKY_USERNAME, env.BSKY_PASSWORD);
+        await bluesky.agent.resumeSession(sessionData);
+      } else {
+        await bluesky.login(env.BSKY_USERNAME, env.BSKY_PASSWORD);
+      }
+
+      return bluesky;
+    } catch (error: unknown) {
+      if (isRateLimitError(error)) {
+        throw new RateLimitError(
+          `Rate limited until ${error.headers["ratelimit-reset"]}`,
+        );
+      }
+
+      throw error;
     }
-
-    return bluesky;
   }
 
   async getProfile(): Promise<
@@ -94,3 +106,15 @@ export class BlueSky {
     });
   }
 }
+
+const isRateLimitError = (
+  error: unknown,
+): error is BlueskyRateLimitExceededError => {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "error" in error &&
+    error.error === "RateLimitExceeded" &&
+    "headers" in error
+  );
+};
