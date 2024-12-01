@@ -6,7 +6,7 @@ import {
 } from "@atproto/api";
 
 import { Env } from "../types";
-import { RateLimitError } from "../errors/rate-limit-error";
+import { RateLimitError } from "../errors";
 import { BlueskyRateLimitExceededError } from "../types/bluesky";
 
 const SESSION_KEY = "session";

@@ -1,14 +1,9 @@
 import { LastFM } from "../api-wrappers/lastfm";
+import { NoEnabledServicesError } from "../errors";
 import { Env } from "../types";
 import { NormalizedTrack } from "../types/track";
 
 type EnabledServices = "lastfm";
-
-class NoEnabledServicesError extends Error {
-  constructor() {
-    super("You must enable at least one service to fetch the latest track.");
-  }
-}
 
 export class LatestTrackFetcher {
   private env: Env;
