@@ -1,6 +1,6 @@
 import { LastFM } from "../api-wrappers/lastfm";
 import { NoEnabledServicesError } from "../errors";
-import { Env } from "../types";
+import { Env } from "../types/env";
 import { NormalizedTrack } from "../types/track";
 
 type EnabledServices = "lastfm";

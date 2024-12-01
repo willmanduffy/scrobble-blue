@@ -1,4 +1,4 @@
-import { Env } from "../types";
+import { Env } from "../types/env";
 import { BlueSky } from "../api-wrappers/bluesky";
 import { LatestTrackFetcher } from "./latest-track-fetcher";
 import { ProfileDescriptionGenerator } from "./profile-description-generator";

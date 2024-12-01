@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import { Env } from "../../src/types";
+import { Env } from "../../src/types/env";
 
 export const mockEnv: Env = {
   BLUESKY_SESSION_STORAGE: {
