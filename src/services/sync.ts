@@ -4,7 +4,8 @@ import { LatestTrackFetcher } from "./latest-track-fetcher";
 
 export const sync = async (env: Env) => {
   const latestTrackFetcher = new LatestTrackFetcher(env);
-  const latestTrack = await latestTrackFetcher.fetchLatestTrack();
+
+  const latestTrack = await latestTrackFetcher.call();
 
   if (latestTrack) {
     try {

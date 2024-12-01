@@ -28,7 +28,7 @@ describe("LatestTrackFetcher", () => {
 
       mockGetLatestSong.mockResolvedValueOnce(mockTrack);
 
-      const result = await fetcher.fetchLatestTrack();
+      const result = await fetcher.call();
 
       expect(mockGetLatestSong).toHaveBeenCalled();
       expect(result).toEqual(mockTrack);
@@ -37,7 +37,7 @@ describe("LatestTrackFetcher", () => {
     it("should return undefined when no track is found", async () => {
       mockGetLatestSong.mockResolvedValueOnce(undefined);
 
-      const result = await fetcher.fetchLatestTrack();
+      const result = await fetcher.call();
 
       expect(mockGetLatestSong).toHaveBeenCalled();
       expect(result).toBeUndefined();
@@ -48,7 +48,7 @@ describe("LatestTrackFetcher", () => {
 
       fetcher = new LatestTrackFetcher(envWithoutLastFM);
 
-      await expect(fetcher.fetchLatestTrack()).rejects.toThrow(
+      await expect(fetcher.call()).rejects.toThrow(
         "You must enable at least one service to fetch the latest track.",
       );
 
