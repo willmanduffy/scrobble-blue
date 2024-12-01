@@ -1,6 +1,7 @@
 import { Env } from "../types";
 import { BlueSky } from "../api-wrappers/bluesky";
 import { LatestTrackFetcher } from "./latest-track-fetcher";
+import { ProfileDescriptionGenerator } from "./profile-description-generator";
 
 export const sync = async (env: Env) => {
   const latestTrackFetcher = new LatestTrackFetcher(env);
@@ -12,27 +13,16 @@ export const sync = async (env: Env) => {
       const bluesky = await BlueSky.retrieveAgent(env);
       const profile = await bluesky.getProfile();
 
-      const existingDescription = getBaseDescription(
-        profile?.description || "",
-      );
-
-      const newDescription = `${existingDescription}\n\n🎵 Now Playing: "${latestTrack.name}" by ${latestTrack.artist}`;
+      const newDescription = new ProfileDescriptionGenerator(
+        profile,
+        latestTrack,
+      ).call();
 
       await bluesky.updateDescription(newDescription);
     } catch (error) {
-      console.error("Failed to post to BlueSky:", error);
+      console.error("Failed to update profile on BlueSky:", error);
     }
   } else {
     console.log("No recent tracks found");
   }
-};
-
-const getBaseDescription = (description: string): string => {
-  const nowPlayingIndex = description.indexOf("🎵 Now Playing:");
-
-  if (nowPlayingIndex === -1) {
-    return description.trim();
-  }
-
-  return description.substring(0, nowPlayingIndex).trim();
 };
