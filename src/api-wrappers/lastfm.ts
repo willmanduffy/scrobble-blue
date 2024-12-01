@@ -44,6 +44,7 @@ export class LastFM {
     return {
       name: track.name,
       artist: track.artist["#text"],
+      timestamp: track.date?.uts ? parseInt(track.date.uts) : 0,
     };
   }
 }

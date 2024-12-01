@@ -1,16 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { ProfileDescriptionGenerator } from "./profile-description-generator";
 import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
-import { NormalizedTrack } from "../types/track";
+import { track } from "../../tests/fixtures/track";
 
 describe("ProfileDescriptionGenerator", () => {
-  const mockTrack: NormalizedTrack = {
-    artist: "Test Artist",
-    name: "Test Song",
-  };
-
   it("should generate description with only now playing when no existing description", () => {
-    const generator = new ProfileDescriptionGenerator(undefined, mockTrack);
+    const generator = new ProfileDescriptionGenerator(undefined, track);
 
     expect(generator.call()).toBe('🎵 Now Playing: "Test Song" by Test Artist');
   });
@@ -22,7 +17,7 @@ describe("ProfileDescriptionGenerator", () => {
       description: "My cool profile",
     } as ProfileViewDetailed;
 
-    const generator = new ProfileDescriptionGenerator(profile, mockTrack);
+    const generator = new ProfileDescriptionGenerator(profile, track);
 
     expect(generator.call()).toBe(
       'My cool profile\n\n🎵 Now Playing: "Test Song" by Test Artist',
@@ -37,7 +32,7 @@ describe("ProfileDescriptionGenerator", () => {
         'My cool profile\n\n🎵 Now Playing: "Old Song" by Old Artist',
     } as ProfileViewDetailed;
 
-    const generator = new ProfileDescriptionGenerator(profile, mockTrack);
+    const generator = new ProfileDescriptionGenerator(profile, track);
 
     expect(generator.call()).toBe(
       'My cool profile\n\n🎵 Now Playing: "Test Song" by Test Artist',
@@ -51,7 +46,7 @@ describe("ProfileDescriptionGenerator", () => {
       description: "",
     } as ProfileViewDetailed;
 
-    const generator = new ProfileDescriptionGenerator(profile, mockTrack);
+    const generator = new ProfileDescriptionGenerator(profile, track);
 
     expect(generator.call()).toBe('🎵 Now Playing: "Test Song" by Test Artist');
   });
@@ -63,7 +58,7 @@ describe("ProfileDescriptionGenerator", () => {
       description: "\n\n🎵 Now Playing: 'Old Song' by Old Artist",
     } as ProfileViewDetailed;
 
-    const generator = new ProfileDescriptionGenerator(profile, mockTrack);
+    const generator = new ProfileDescriptionGenerator(profile, track);
 
     expect(generator.call()).toBe('🎵 Now Playing: "Test Song" by Test Artist');
   });
@@ -75,7 +70,7 @@ describe("ProfileDescriptionGenerator", () => {
       description: '🎵 Now Playing: "Old Song" by Old Artist',
     } as ProfileViewDetailed;
 
-    const generator = new ProfileDescriptionGenerator(profile, mockTrack);
+    const generator = new ProfileDescriptionGenerator(profile, track);
 
     expect(generator.call()).toBe('🎵 Now Playing: "Test Song" by Test Artist');
   });

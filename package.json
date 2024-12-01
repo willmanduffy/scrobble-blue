@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "@atproto/api": "^0.13.18",
-    "@imikailoby/lastfm-ts": "^2.0.1"
+    "@imikailoby/lastfm-ts": "^2.0.1",
+    "@kellnerd/listenbrainz": "npm:@jsr/kellnerd__listenbrainz@^0.8.4"
   },
   "scripts": {
     "test": "vitest run"
