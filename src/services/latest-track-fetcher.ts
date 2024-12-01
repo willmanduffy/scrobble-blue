@@ -1,9 +1,14 @@
 import { LastFM } from "../api-wrappers/lastfm";
-import { RecentTrack } from "../api-wrappers/lastfm.types";
 import { Env } from "../types";
 import { NormalizedTrack } from "../types/track";
 
 type EnabledServices = "lastfm";
+
+class NoEnabledServicesError extends Error {
+  constructor() {
+    super("You must enable at least one service to fetch the latest track.");
+  }
+}
 
 export class LatestTrackFetcher {
   private env: Env;
@@ -16,6 +21,10 @@ export class LatestTrackFetcher {
 
   async fetchLatestTrack(): Promise<NormalizedTrack | undefined> {
     const enabledServices = await this.getEnabledServices();
+
+    if (enabledServices.length === 0) {
+      throw new NoEnabledServicesError();
+    }
 
     let latestTrackChecks: Promise<NormalizedTrack | undefined>[] = [];
 
