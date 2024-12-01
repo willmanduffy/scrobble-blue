@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BlueSky } from "./bluesky";
 import { AtpAgent, ComAtprotoServerCreateSession } from "@atproto/api";
 import { mockEnv } from "../../tests/fixtures/env";
+import { RateLimitError } from "../errors/rate-limit-error";
 
 type CreateSessionResponse = ComAtprotoServerCreateSession.Response;
 
@@ -102,6 +103,42 @@ describe("BlueSky", () => {
       });
 
       expect(bluesky).toBeInstanceOf(BlueSky);
+    });
+
+    it("should handle rate limiting during login", async () => {
+      vi.mocked(mockEnv.BLUESKY_SESSION_STORAGE.get).mockResolvedValueOnce(
+        null,
+      );
+
+      const mockRateLimitError = {
+        error: "RateLimitExceeded",
+        headers: {
+          "ratelimit-limit": "100",
+          "ratelimit-policy": "100;w=86400",
+          "ratelimit-remaining": "0",
+          "ratelimit-reset": "1733077560",
+        },
+      };
+
+      vi.mocked(agent.login).mockRejectedValueOnce(mockRateLimitError);
+
+      const promise = BlueSky.retrieveAgent(mockEnv);
+
+      await expect(promise).rejects.toThrow(RateLimitError);
+      await expect(promise).rejects.toThrow("Rate limited until 1733077560");
+    });
+
+    it("should pass through other errors during login", async () => {
+      vi.mocked(mockEnv.BLUESKY_SESSION_STORAGE.get).mockResolvedValueOnce(
+        null,
+      );
+
+      const originalError = new Error("Some other error");
+      vi.mocked(agent.login).mockRejectedValueOnce(originalError);
+
+      const promise = BlueSky.retrieveAgent(mockEnv);
+
+      await expect(promise).rejects.toThrow(originalError);
     });
   });
 
