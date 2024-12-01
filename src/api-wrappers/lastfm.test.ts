@@ -58,7 +58,10 @@ describe("LastFM", () => {
         user: mockEnv.LASTFM_USERNAME,
         limit: "1",
       });
-      expect(result).toEqual(mockTrack);
+      expect(result).toEqual({
+        name: "Test Track",
+        artist: "Test Artist",
+      });
     });
 
     it("should return undefined if no tracks are found", async () => {
@@ -124,7 +127,10 @@ describe("LastFM", () => {
 
       const result = await lastfm.getLatestSong();
 
-      expect(result).toEqual(mockTrack);
+      expect(result).toEqual({
+        name: "Test Track",
+        artist: "Test Artist",
+      });
     });
   });
 });
