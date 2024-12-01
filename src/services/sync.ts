@@ -1,12 +1,12 @@
 import { Env } from "../types";
 import { BlueSky } from "../api-wrappers/bluesky";
-import { LastFM } from "../api-wrappers/lastfm";
+import { LatestTrackFetcher } from "./latest-track-fetcher";
 
 export const sync = async (env: Env) => {
-  const lastfm = new LastFM(env);
-  const latestSong = await lastfm.getLatestSong();
+  const latestTrackFetcher = new LatestTrackFetcher(env);
+  const latestTrack = await latestTrackFetcher.fetchLatestTrack();
 
-  if (latestSong) {
+  if (latestTrack) {
     try {
       const bluesky = await BlueSky.retrieveAgent(env);
       const profile = await bluesky.getProfile();
@@ -15,7 +15,7 @@ export const sync = async (env: Env) => {
         profile?.description || "",
       );
 
-      const newDescription = `${existingDescription}\n\n🎵 Now Playing: "${latestSong.name}" by ${latestSong.artist["#text"]}`;
+      const newDescription = `${existingDescription}\n\n🎵 Now Playing: "${latestTrack.name}" by ${latestTrack.artist}`;
 
       await bluesky.updateDescription(newDescription);
     } catch (error) {

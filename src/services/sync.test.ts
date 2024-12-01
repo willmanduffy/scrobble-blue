@@ -15,9 +15,7 @@ describe("sync", () => {
   it("should update BlueSky profile with latest song", async () => {
     const mockTrack = {
       name: "Test Track",
-      artist: { "#text": "Test Artist", mbid: "" },
-      album: { "#text": "Test Album", mbid: "" },
-      url: "https://test.url",
+      artist: "Test Artist",
     };
 
     const mockUpdateDescription = vi.fn();
@@ -53,9 +51,7 @@ describe("sync", () => {
   it("should preserve existing description and replace Now Playing", async () => {
     const mockTrack = {
       name: "Test Track",
-      artist: { "#text": "Test Artist", mbid: "" },
-      album: { "#text": "Test Album", mbid: "" },
-      url: "https://test.url",
+      artist: "Test Artist",
     };
 
     const mockUpdateDescription = vi.fn();
@@ -81,9 +77,7 @@ describe("sync", () => {
   it("should handle BlueSky errors", async () => {
     const mockTrack = {
       name: "Test Track",
-      artist: { "#text": "Test Artist", mbid: "" },
-      album: { "#text": "Test Album", mbid: "" },
-      url: "https://test.url",
+      artist: "Test Artist",
     };
 
     vi.mocked(LastFM.prototype.getLatestSong).mockResolvedValue(mockTrack);

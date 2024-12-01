@@ -1,6 +1,7 @@
 import { LastFm } from "@imikailoby/lastfm-ts";
 import { RecentTrack } from "./lastfm.types";
 import { Env } from "../types";
+import { NormalizedTrack } from "../types/track";
 
 export class LastFM {
   private client: LastFm;
@@ -11,7 +12,7 @@ export class LastFM {
     this.username = env.LASTFM_USERNAME;
   }
 
-  async getLatestSong(): Promise<RecentTrack | undefined> {
+  async getLatestSong(): Promise<NormalizedTrack | undefined> {
     try {
       const response = await this.client.user.getRecentTracks({
         user: this.username,
@@ -22,10 +23,23 @@ export class LastFM {
         return;
       }
 
-      return response.recenttracks.track[0];
+      return this.normalizeTrack(response.recenttracks.track[0]);
     } catch (error) {
       console.error("Failed to fetch latest song:", error);
       return;
     }
+  }
+
+  private normalizeTrack(
+    track: RecentTrack | undefined,
+  ): NormalizedTrack | undefined {
+    if (!track) {
+      return;
+    }
+
+    return {
+      name: track.name,
+      artist: track.artist["#text"],
+    };
   }
 }
