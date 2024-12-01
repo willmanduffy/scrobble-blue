@@ -1,6 +1,6 @@
 import { LastFm } from "@imikailoby/lastfm-ts";
 import { RecentTrack } from "./lastfm.types";
-import { Env } from "../types";
+import { Env } from "../types/env";
 import { NormalizedTrack } from "../types/track";
 
 export class LastFM {

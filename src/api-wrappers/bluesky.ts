@@ -5,7 +5,7 @@ import {
   AtpSessionData,
 } from "@atproto/api";
 
-import { Env } from "../types";
+import { Env } from "../types/env";
 import { RateLimitError } from "../errors";
 import { BlueskyRateLimitExceededError } from "../types/bluesky";
 
