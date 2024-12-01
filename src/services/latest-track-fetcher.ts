@@ -1,46 +1,42 @@
 import { LastFM } from "../api-wrappers/lastfm";
+import { ListenBrainz } from "../api-wrappers/listenbrainz";
 import { NoEnabledServicesError } from "../errors";
 import { Env } from "../types/env";
 import { NormalizedTrack } from "../types/track";
 
-type EnabledServices = "lastfm";
-
 export class LatestTrackFetcher {
-  private env: Env;
-  private lastfm: LastFM;
+  private lastfm?: LastFM;
+  private listenbrainz?: ListenBrainz;
 
-  constructor(env: Env) {
-    this.env = env;
-    this.lastfm = new LastFM(env);
+  constructor(private env: Env) {
+    if (env.LASTFM_API_KEY) {
+      this.lastfm = new LastFM(env);
+    }
+
+    if (env.LISTENBRAINZ_TOKEN) {
+      this.listenbrainz = new ListenBrainz(env);
+    }
   }
 
   async call(): Promise<NormalizedTrack | undefined> {
-    const enabledServices = await this.getEnabledServices();
-
-    if (enabledServices.length === 0) {
+    if (!this.lastfm && !this.listenbrainz) {
       throw new NoEnabledServicesError();
     }
 
     let latestTrackChecks: Promise<NormalizedTrack | undefined>[] = [];
 
-    if (enabledServices.includes("lastfm")) {
+    if (this.lastfm) {
       latestTrackChecks.push(this.lastfm.getLatestSong());
+    }
+
+    if (this.listenbrainz) {
+      latestTrackChecks.push(this.listenbrainz.getLatestSong());
     }
 
     const latestTracks = await Promise.all(latestTrackChecks);
 
-    // TODO: As we add more services, we'll need to sort by timestamp across multiple services.
-    // For now, just the first one works for our current needs.
-    return latestTracks[0];
-  }
-
-  private async getEnabledServices() {
-    let enabledServices: EnabledServices[] = [];
-
-    if (this.env.LASTFM_API_KEY) {
-      enabledServices.push("lastfm");
-    }
-
-    return enabledServices;
+    return latestTracks
+      .filter(Boolean)
+      .sort((a, b) => b!.timestamp - a!.timestamp)[0];
   }
 }

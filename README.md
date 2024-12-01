@@ -1,27 +1,37 @@
 # Scrobble Blue
 
-Update your Bluesky profile description with your currently playing track from Last.fm. This application requires a Bluesky account and Last.fm API key and for you to run your own Cloudflare Worker. You are able to use the free tier of Cloudflare for this application.
+Update your Bluesky profile description with your currently playing track from Last.fm or ListenBrainz. This application requires a Bluesky account and at least one scrobble service API key. You can use the free tier of Cloudflare for this application.
 
 ![Screenshot](https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:wnakkpxj4ndea7yetar7y7zq/bafkreibcfaffmp4345plad6kj2qsqxvc5wupaq4k5tjbrzkfpmuukhrlnm@jpeg)
 
 ## Prerequisites
 
-1. **Cloudflare Account**
+### Cloudflare Account
 
 This is a Cloudflare worker, so you'll need an account.
 
-   - Sign up at [Cloudflare](https://dash.cloudflare.com/sign-up)
-   - Install Wrangler: `npm install -g wrangler`
-   - Run `wrangler login`
+- Sign up at [Cloudflare](https://dash.cloudflare.com/sign-up)
+- Install Wrangler: `npm install -g wrangler`
+- Run `wrangler login`
 
-2. **Last.fm API Account**
-   - Create an account at [Last.fm](https://www.last.fm)
-   - Get API credentials from [Last.fm API](https://www.last.fm/api/account/create)
+### Bluesky App Password
+- Log into [Bluesky](https://bsky.app)
+- Go to Settings → App Passwords
+- Create a new app password. You can use your real password, but it's recommended to create a new one for this app that can be revoked if necessary. This also allows you to login even if you have MFA enabled.
 
-3. **Bluesky App Password**
-   - Log into [Bluesky](https://bsky.app)
-   - Go to Settings → App Passwords
-   - Create a new app password. You can use your real password, but it's recommended to create a new one for this app that can be revoked if necessary. This also allows you to login even if you have MFA enabled.
+### Scrobble Services
+
+You need to set up at least one of these services:
+
+#### Last.fm
+- Create an account at [Last.fm](https://www.last.fm)
+- Get API credentials from [Last.fm API](https://www.last.fm/api/account/create)
+
+#### ListenBrainz
+- Create an account at [ListenBrainz](https://listenbrainz.org)
+- Get your API token from [Profile Settings](https://listenbrainz.org/profile/)
+
+If both services are configured, Scrobble Blue will automatically use the most recently scrobbled track from either service.
 
 ## Setup
 
@@ -61,9 +71,13 @@ This is a Cloudflare worker, so you'll need an account.
    ```bash
    wrangler secret put BSKY_USERNAME
    wrangler secret put BSKY_PASSWORD
+   # For Last.fm
    wrangler secret put LASTFM_API_KEY
    wrangler secret put LASTFM_SECRET
    wrangler secret put LASTFM_USERNAME
+   # For ListenBrainz
+   wrangler secret put LISTENBRAINZ_TOKEN
+   wrangler secret put LISTENBRAINZ_USERNAME
    ```
 
 6. Deploy the worker:

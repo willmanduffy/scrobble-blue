@@ -61,6 +61,7 @@ describe("LastFM", () => {
       expect(result).toEqual({
         name: "Test Track",
         artist: "Test Artist",
+        timestamp: 1234567890,
       });
     });
 
@@ -130,6 +131,7 @@ describe("LastFM", () => {
       expect(result).toEqual({
         name: "Test Track",
         artist: "Test Artist",
+        timestamp: 0,
       });
     });
   });

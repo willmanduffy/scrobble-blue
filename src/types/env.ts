@@ -5,4 +5,6 @@ export interface Env {
   BSKY_SERVICE?: string;
   LASTFM_API_KEY?: string;
   LASTFM_USERNAME?: string;
+  LISTENBRAINZ_TOKEN?: string;
+  LISTENBRAINZ_USERNAME?: string;
 }

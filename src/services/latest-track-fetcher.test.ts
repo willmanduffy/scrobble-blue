@@ -1,13 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { LatestTrackFetcher } from "./latest-track-fetcher";
 import { mockEnv } from "../../tests/fixtures/env";
-import { NormalizedTrack } from "../types/track";
+import { track } from "../../tests/fixtures/track";
 
-const mockGetLatestSong = vi.fn();
+const mockLastFMGetLatestSong = vi.fn();
+const mockListenBrainzGetLatestSong = vi.fn();
 
 vi.mock("../api-wrappers/lastfm", () => ({
   LastFM: vi.fn().mockImplementation(() => ({
-    getLatestSong: mockGetLatestSong,
+    getLatestSong: mockLastFMGetLatestSong,
+  })),
+}));
+
+vi.mock("../api-wrappers/listenbrainz", () => ({
+  ListenBrainz: vi.fn().mockImplementation(() => ({
+    getLatestSong: mockListenBrainzGetLatestSong,
   })),
 }));
 
@@ -19,40 +26,92 @@ describe("LatestTrackFetcher", () => {
     fetcher = new LatestTrackFetcher(mockEnv);
   });
 
-  describe("fetchLatestTrack", () => {
-    it("should fetch track from LastFM when enabled", async () => {
-      const mockTrack: NormalizedTrack = {
-        artist: "Test Artist",
-        name: "Test Song",
+  describe("call", () => {
+    it("should fetch track from LastFM when only LastFM is enabled", async () => {
+      const envWithOnlyLastFM = {
+        ...mockEnv,
+        LISTENBRAINZ_TOKEN: undefined,
       };
+      fetcher = new LatestTrackFetcher(envWithOnlyLastFM);
 
-      mockGetLatestSong.mockResolvedValueOnce(mockTrack);
+      mockLastFMGetLatestSong.mockResolvedValueOnce(track);
 
       const result = await fetcher.call();
 
-      expect(mockGetLatestSong).toHaveBeenCalled();
-      expect(result).toEqual(mockTrack);
+      expect(mockLastFMGetLatestSong).toHaveBeenCalled();
+      expect(mockListenBrainzGetLatestSong).not.toHaveBeenCalled();
+      expect(result).toEqual(track);
     });
 
-    it("should return undefined when no track is found", async () => {
-      mockGetLatestSong.mockResolvedValueOnce(undefined);
+    it("should fetch track from ListenBrainz when only ListenBrainz is enabled", async () => {
+      const envWithOnlyListenBrainz = {
+        ...mockEnv,
+        LASTFM_API_KEY: undefined,
+        LISTENBRAINZ_TOKEN: "token",
+        LISTENBRAINZ_USERNAME: "username",
+      };
+      fetcher = new LatestTrackFetcher(envWithOnlyListenBrainz);
+
+      mockListenBrainzGetLatestSong.mockResolvedValueOnce(track);
 
       const result = await fetcher.call();
 
-      expect(mockGetLatestSong).toHaveBeenCalled();
-      expect(result).toBeUndefined();
+      expect(mockLastFMGetLatestSong).not.toHaveBeenCalled();
+      expect(mockListenBrainzGetLatestSong).toHaveBeenCalled();
+      expect(result).toEqual(track);
+    });
+
+    it("should return most recent track when both services are enabled", async () => {
+      const envWithBoth = {
+        ...mockEnv,
+        LISTENBRAINZ_TOKEN: "token",
+        LISTENBRAINZ_USERNAME: "username",
+      };
+      fetcher = new LatestTrackFetcher(envWithBoth);
+
+      const olderTrack = { ...track, timestamp: 1000 };
+      const newerTrack = { ...track, timestamp: 2000 };
+
+      mockLastFMGetLatestSong.mockResolvedValueOnce(olderTrack);
+      mockListenBrainzGetLatestSong.mockResolvedValueOnce(newerTrack);
+
+      const result = await fetcher.call();
+
+      expect(mockLastFMGetLatestSong).toHaveBeenCalled();
+      expect(mockListenBrainzGetLatestSong).toHaveBeenCalled();
+      expect(result).toEqual(newerTrack);
+    });
+
+    it("should handle when one service returns undefined", async () => {
+      const envWithBoth = {
+        ...mockEnv,
+        LISTENBRAINZ_TOKEN: "token",
+        LISTENBRAINZ_USERNAME: "username",
+      };
+      fetcher = new LatestTrackFetcher(envWithBoth);
+
+      mockLastFMGetLatestSong.mockResolvedValueOnce(undefined);
+      mockListenBrainzGetLatestSong.mockResolvedValueOnce(track);
+
+      const result = await fetcher.call();
+
+      expect(result).toEqual(track);
     });
 
     it("should throw when no services are enabled", async () => {
-      const envWithoutLastFM = { ...mockEnv, LASTFM_API_KEY: undefined };
+      const envWithNoServices = {
+        ...mockEnv,
+        LASTFM_API_KEY: undefined,
+      };
 
-      fetcher = new LatestTrackFetcher(envWithoutLastFM);
+      fetcher = new LatestTrackFetcher(envWithNoServices);
 
       await expect(fetcher.call()).rejects.toThrow(
         "You must enable at least one service to fetch the latest track.",
       );
 
-      expect(mockGetLatestSong).not.toHaveBeenCalled();
+      expect(mockLastFMGetLatestSong).not.toHaveBeenCalled();
+      expect(mockListenBrainzGetLatestSong).not.toHaveBeenCalled();
     });
   });
 });
