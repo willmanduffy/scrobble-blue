@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BlueSky } from "./bluesky";
 import { AtpAgent, ComAtprotoServerCreateSession } from "@atproto/api";
 import { mockEnv } from "../../tests/fixtures/env";
-import { RateLimitError } from "../errors/rate-limit-error";
+import { RateLimitError } from "../errors";
 
 type CreateSessionResponse = ComAtprotoServerCreateSession.Response;
 
