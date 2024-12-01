@@ -19,7 +19,7 @@ export class LatestTrackFetcher {
     this.lastfm = new LastFM(env);
   }
 
-  async fetchLatestTrack(): Promise<NormalizedTrack | undefined> {
+  async call(): Promise<NormalizedTrack | undefined> {
     const enabledServices = await this.getEnabledServices();
 
     if (enabledServices.length === 0) {
