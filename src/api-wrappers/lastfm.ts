@@ -8,6 +8,10 @@ export class LastFM {
   private username: string;
 
   constructor(env: Env) {
+    if (!env.LASTFM_API_KEY || !env.LASTFM_USERNAME) {
+      throw new Error("LASTFM_API_KEY and LASTFM_USERNAME must be set.");
+    }
+
     this.client = new LastFm(env.LASTFM_API_KEY);
     this.username = env.LASTFM_USERNAME;
   }
