@@ -3,6 +3,7 @@ import {
   AppBskyActorDefs,
   AtpSessionEvent,
   AtpSessionData,
+  RichText,
 } from "@atproto/api";
 
 import { Env } from "../types/env";
@@ -10,6 +11,15 @@ import { RateLimitError } from "../errors";
 import { BlueskyRateLimitExceededError } from "../types/bluesky";
 
 const SESSION_KEY = "session";
+
+interface PostMessageOptions {
+  altText?: string;
+  aspectRatio?: {
+    width: number;
+    height: number;
+  };
+  embedImage?: Blob;
+}
 
 export class BlueSky {
   private agent: AtpAgent;
@@ -75,10 +85,38 @@ export class BlueSky {
     }
   }
 
-  async postMessage(text: string): Promise<void> {
+  async postMessage(
+    text: string,
+    options: PostMessageOptions = {},
+  ): Promise<void> {
     try {
+      let embed;
+
+      if (options.embedImage) {
+        const uploadResponse = await this.agent.uploadBlob(options.embedImage, {
+          encoding: "image/jpeg",
+        });
+
+        embed = {
+          $type: "app.bsky.embed.images",
+          images: [
+            {
+              alt: options.altText,
+              image: uploadResponse.data.blob,
+              aspectRatio: options.aspectRatio,
+            },
+          ],
+        };
+      }
+
+      const richText = new RichText({ text });
+
+      await richText.detectFacets(this.agent);
+
       await this.agent.post({
-        text,
+        text: richText.text,
+        facets: richText.facets,
+        embed,
         createdAt: new Date().toISOString(),
       });
     } catch (error) {

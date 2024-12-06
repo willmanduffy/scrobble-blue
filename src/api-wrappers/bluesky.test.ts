@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BlueSky } from "./bluesky";
-import { AtpAgent, ComAtprotoServerCreateSession } from "@atproto/api";
+import {
+  AtpAgent,
+  ComAtprotoServerCreateSession,
+  RichText,
+} from "@atproto/api";
 import { mockEnv } from "../../tests/fixtures/env";
 import { RateLimitError } from "../errors";
 
@@ -23,6 +27,11 @@ vi.mock("@atproto/api", () => {
       login: mockLogin,
       resumeSession: mockResumeSession,
       session: { did: "test-did" },
+    })),
+    RichText: vi.fn().mockImplementation(({ text }) => ({
+      text,
+      facets: [],
+      detectFacets: vi.fn(),
     })),
   };
 });
@@ -158,6 +167,9 @@ describe("BlueSky", () => {
 
       vi.mocked(agent.login).mockResolvedValueOnce(mockLoginResponse);
 
+      const mockRichText = new RichText({ text: "Test message" });
+      vi.mocked(RichText).mockReturnValueOnce(mockRichText);
+
       vi.mocked(agent.post).mockResolvedValueOnce({
         uri: "at://test-did/app.bsky.feed.post/test",
         cid: "test-cid",
@@ -169,7 +181,8 @@ describe("BlueSky", () => {
       await bluesky.postMessage(message);
 
       expect(agent.post).toHaveBeenCalledWith({
-        text: message,
+        text: mockRichText.text,
+        facets: mockRichText.facets,
         createdAt: expect.any(String),
       });
     });
