@@ -7,7 +7,10 @@ kv_namespaces = [
 ]
 
 [triggers]
-crons = [ "* * * * *" ]
+crons = [
+  "* * * * *",      # Every minute for track sync
+  "0 10 * * 1"      # Every Monday at 10am EST for weekly top artists
+]
 
 [observability.logs]
 enabled = true
