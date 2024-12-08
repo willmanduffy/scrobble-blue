@@ -1,4 +1,13 @@
 // Data Types
+export interface Artist {
+  name: string;
+  playcount: string;
+  url: string;
+  image: {
+    "#text": string;
+    size: "small" | "medium" | "large" | "extralarge" | "mega" | "";
+  }[];
+}
 export interface RecentTrack {
   name: string;
   artist: {
