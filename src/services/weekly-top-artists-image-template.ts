@@ -47,7 +47,7 @@ export const weeklyTopArtistsImageTemplate = (
             <div style="flex: 1; padding: 50px 50px 50px 100px; display: flex; flex-direction: column; position: relative">
             <div style="display: flex; flex-direction: column; flex: 1">
                 <div style="display: flex; flex-direction: column; margin-bottom: 65px">
-                <h2 style="font-size: 42px; margin: 0 0 5px; font-weight: 800; display: flex; align-items: baseline">
+                <h2 style="font-size: 42px; margin: 0 0 5px 20px; font-weight: 800; display: flex; align-items: baseline">
                     <span style="position: relative; display: flex">
                     <span style="position: absolute; top: -5px; left: -10px; right: -10px; bottom: 5px; background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.15)); transform: skew(-10deg) rotate(-1deg); display: flex"></span>
                     <span style="background: linear-gradient(90deg, #8B5CF6, #3B82F6, #06B6D4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 48px; margin-right: 15px; padding: 5px; display: flex; position: relative">Top artists</span>
@@ -55,16 +55,16 @@ export const weeklyTopArtistsImageTemplate = (
                     <span style="color: rgba(255,255,255,0.7)">of the week</span>
                 </h2>
                 </div>
-                <div style="display: flex; flex-direction: column">
+                <div style="display: flex; flex-direction: column; margin-left: 25px">
                 ${artists
                   .map(
                     (artist, index) => `
-                    <div style="margin-bottom: 70px; display: flex; flex-direction: column">
+                    <div style="margin-bottom: 30px; display: flex; flex-direction: column">
                     <div style="display: flex; flex-direction: column">
-                        <h3 style="font-size: 32px; margin: 0; font-weight: 700; display: flex; align-items: center">
+                        <h3 style="font-size: 32px; margin: 0 0 15px 0; font-weight: 700; display: flex; align-items: center">
                         <span style="color: ${ACCENT_COLOR}; font-weight: 800; margin-right: 12px; text-shadow: 0 0 20px rgba(0, 255, 255, 0.4); font-size: 36px; width: 40px; display: flex; align-items: center">${index + 1}</span>
                         <div style="display: flex; flex-direction: column">
-                            <span>${artist.name}</span>
+                            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px">${artist.name}</span>
                             <span style="font-size: 20px; margin-top: 4px; color: rgba(255,255,255,0.6); font-weight: 700">${artist.playcount} plays</span>
                         </div>
                         </h3>
@@ -77,7 +77,7 @@ export const weeklyTopArtistsImageTemplate = (
             </div>
             <div style="display: flex; justify-content: flex-end; padding: 0 0 0">
                 <span style="font-size: 20px;">
-                <span>Powered by </span><span style="color: ${ACCENT_COLOR}; margin-left: 8px"> scrobble.blue</span>
+                    <span>Powered by </span><span style="color: ${ACCENT_COLOR}; margin-left: 8px"> scrobble.blue</span>
                 </span>
             </div>
             </div>
