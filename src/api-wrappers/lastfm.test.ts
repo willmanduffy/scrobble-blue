@@ -1,14 +1,14 @@
 import { vi } from "vitest";
 
 const mockGetRecentTracks = vi.fn();
-const mockGetWeeklyArtistChart = vi.fn();
+const mockGetTopArtists = vi.fn();
 const mockGetArtistInfo = vi.fn();
 
 vi.mock("@imikailoby/lastfm-ts", () => ({
   LastFm: vi.fn(() => ({
     user: {
       getRecentTracks: mockGetRecentTracks,
-      getWeeklyArtistChart: mockGetWeeklyArtistChart,
+      getTopArtists: mockGetTopArtists,
     },
     artist: {
       getInfo: mockGetArtistInfo,
@@ -152,13 +152,8 @@ describe("LastFM", () => {
         { name: "Artist 3", playcount: "5", mbid: "", url: "" },
       ];
 
-      mockGetWeeklyArtistChart.mockResolvedValueOnce({
-        weeklyartistchart: {
-          "@attr": {
-            from: "1234567890",
-            to: "1234567890",
-            user: mockEnv.LASTFM_USERNAME,
-          },
+      mockGetTopArtists.mockResolvedValueOnce({
+        topartists: {
           artist: mockTopArtists,
         },
       });
@@ -188,8 +183,9 @@ describe("LastFM", () => {
 
       const result = await lastfm.getWeeklyTopArtists();
 
-      expect(mockGetWeeklyArtistChart).toHaveBeenCalledWith({
+      expect(mockGetTopArtists).toHaveBeenCalledWith({
         user: mockEnv.LASTFM_USERNAME,
+        period: "7day",
       });
 
       expect(result).toEqual([
@@ -212,13 +208,8 @@ describe("LastFM", () => {
     });
 
     it("should return empty array when no artists found", async () => {
-      mockGetWeeklyArtistChart.mockResolvedValueOnce({
-        weeklyartistchart: {
-          "@attr": {
-            from: "1234567890",
-            to: "1234567890",
-            user: mockEnv.LASTFM_USERNAME,
-          },
+      mockGetTopArtists.mockResolvedValueOnce({
+        topartists: {
           artist: [],
         },
       });
@@ -229,7 +220,7 @@ describe("LastFM", () => {
     });
 
     it("should return empty array when API call fails", async () => {
-      mockGetWeeklyArtistChart.mockRejectedValueOnce(new Error("API Error"));
+      mockGetTopArtists.mockRejectedValueOnce(new Error("API Error"));
 
       const result = await lastfm.getWeeklyTopArtists();
 

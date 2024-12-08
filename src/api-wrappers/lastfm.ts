@@ -1,8 +1,7 @@
-import { Artist, LastFm } from "@imikailoby/lastfm-ts";
-import { RecentTrack } from "./lastfm.types";
+import { Artist as LastFmArtist, LastFm } from "@imikailoby/lastfm-ts";
+import { RecentTrack, Artist } from "./lastfm.types";
 import { Env } from "../types/env";
 import { NormalizedTrack } from "../types/track";
-import { WeeklyTopArtist } from "../types/lastfm";
 import { NormalizedWeeklyTopArtist } from "../types/weekly-top-artist";
 import { NormalizedArtist } from "../types/artist";
 
@@ -21,11 +20,12 @@ export class LastFM {
 
   async getWeeklyTopArtists(limit = 3): Promise<NormalizedWeeklyTopArtist[]> {
     try {
-      const response = await this.client.user.getWeeklyArtistChart({
+      const response = await this.client.user.getTopArtists({
         user: this.username,
+        period: "7day",
       });
 
-      const artists = response.weeklyartistchart?.artist.slice(0, limit);
+      const artists: Artist[] = response.topartists?.artist.slice(0, limit);
 
       if (!artists?.length) {
         return [];
@@ -34,7 +34,9 @@ export class LastFM {
       const artistsWithData = await Promise.all(
         artists.map(async (artist) => {
           const artistInfo = await this.getArtistInfo(artist.name);
+
           if (!artistInfo) return;
+
           return {
             ...artistInfo,
             playcount: artist.playcount,
@@ -92,7 +94,7 @@ export class LastFM {
     }
   }
 
-  private normalizeArtist = (artist: Artist): NormalizedArtist => ({
+  private normalizeArtist = (artist: LastFmArtist): NormalizedArtist => ({
     name: artist.name,
     images: artist.image.map((image) => image["#text"]),
     url: artist.url,
