@@ -15,8 +15,8 @@ export default {
         await sync(env);
         break;
 
-      // Every Monday at 10am EST
-      case "0 10 * * 1":
+      // Every Friday at 15:00 UTC
+      case "0 15 * * 6":
         // Post weekly top artists with image to Bluesky
         await skeetWeeklyTopArtists(env);
         break;
