@@ -2,35 +2,47 @@ import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/act
 import { NormalizedTrack } from "../types/track";
 
 export class ProfileDescriptionGenerator {
+  private readonly NOW_PLAYING_MARKER = "🎵 Now Playing:";
+
   constructor(
     private profile: ProfileViewDetailed | undefined,
-    private latestTrack: NormalizedTrack,
-  ) {
-    this.profile = profile;
-    this.latestTrack = latestTrack;
-  }
+    private track: NormalizedTrack,
+  ) {}
 
   call(): string {
-    if (this.getBaseDescription().length === 0) {
-      return this.getNowPlayingDescription();
-    }
+    // Normalize the existing description, handling undefined and normalizing line breaks
+    const existingDescription = (this.profile?.description || "")
+      .replace(/\r\n/g, "\n")
+      .replace(/\n\n+/g, "\n\n"); // Collapse multiple blank lines
 
-    return `${this.getBaseDescription()}\n\n${this.getNowPlayingDescription()}`;
-  }
+    // Find where the current "Now Playing" section starts
+    const nowPlayingIndex = existingDescription.indexOf(
+      this.NOW_PLAYING_MARKER,
+    );
 
-  private getBaseDescription(): string {
-    let baseDescription = this.profile?.description ?? "";
+    // Get the base description, being careful with trimming
+    let baseDescription =
+      nowPlayingIndex >= 0
+        ? existingDescription.substring(0, nowPlayingIndex)
+        : existingDescription;
 
-    const nowPlayingIndex = baseDescription?.indexOf("🎵 Now Playing:");
+    // First trim completely
+    baseDescription = baseDescription.trim();
 
-    if (nowPlayingIndex === -1) {
-      return baseDescription.trim();
-    }
+    // If there's content (not empty after trim), add double newline
+    const separator = baseDescription ? "\n\n" : "";
 
-    return baseDescription?.substring(0, nowPlayingIndex).trim();
-  }
+    // Construct the new description
+    const newDescription = `${baseDescription}${separator}${this.NOW_PLAYING_MARKER} "${this.track.name}" by ${this.track.artist}`;
 
-  private getNowPlayingDescription(): string {
-    return `🎵 Now Playing: "${this.latestTrack.name}" by ${this.latestTrack.artist}`;
+    // Add some logging to help debug issues
+    console.info({
+      original: this.profile?.description,
+      normalized: existingDescription,
+      baseDescription,
+      final: newDescription,
+    });
+
+    return newDescription;
   }
 }
