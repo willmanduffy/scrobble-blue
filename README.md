@@ -1,8 +1,32 @@
 # Scrobble Blue
 
-Update your Bluesky profile description with your currently playing track from Last.fm or ListenBrainz. This application requires a Bluesky account and at least one scrobble service API key. You can use the free tier of Cloudflare for this application.
+A Bluesky integration that:
+1. Updates your profile description with your currently playing track from Last.fm or ListenBrainz
+2. Posts your weekly top 5 artists every Friday at 15:00 UTC (Last.fm only)
 
-![Screenshot](https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:wnakkpxj4ndea7yetar7y7zq/bafkreibcfaffmp4345plad6kj2qsqxvc5wupaq4k5tjbrzkfpmuukhrlnm@jpeg)
+This application requires a Bluesky account and at least one scrobble service API key. You can use the free tier of Cloudflare for this application.
+
+## Features
+
+### Profile Description Updates
+Updates your Bluesky profile description with your currently playing track. This runs every minute and will update your profile if you're currently scrobbling a track.
+
+- Supports both Last.fm and ListenBrainz
+- When both services are configured, uses the most recently scrobbled track
+- Updates every minute
+- Only updates when there's a new track playing
+
+![Profile Description Example](https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:wnakkpxj4ndea7yetar7y7zq/bafkreibcfaffmp4345plad6kj2qsqxvc5wupaq4k5tjbrzkfpmuukhrlnm@jpeg)
+
+### Weekly Top 5 Artists
+Every Friday at 15:00 UTC, posts an image to your Bluesky feed showing your top 5 most played artists from the past week.
+
+- Currently supports Last.fm only
+- Posts automatically every Friday at 15:00 UTC
+- Generates a custom image with your top 5 artists of the last week.
+- Includes play counts for each artist
+
+![Weekly Top 5 Artists Example](https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:wnakkpxj4ndea7yetar7y7zq/bafkreih7bmoopjgq2oqlkd7o5fvks6nx5decj23b7ywuoisaseg7qqizey@jpeg)
 
 ## Prerequisites
 
@@ -31,7 +55,7 @@ You need to set up at least one of these services:
 - Create an account at [ListenBrainz](https://listenbrainz.org)
 - Get your API token from [Profile Settings](https://listenbrainz.org/profile/)
 
-If both services are configured, Scrobble Blue will automatically use the most recently scrobbled track from either service.
+Note: The weekly top 5 artists feature currently only works with Last.fm. If both services are configured for profile updates, Scrobble Blue will automatically use the most recently scrobbled track from either service.
 
 ## Setup
 
@@ -93,13 +117,17 @@ Run locally:
 wrangler dev --test-scheduled
 ```
 
-To run a test of the sync function, once your worker is running, run:
+To test the different scheduled tasks locally:
 
 ```bash
+# Test currently playing track sync
 curl "http://localhost:8787/__scheduled?cron=*+*+*+*+*"
+
+# Test weekly top artists post (Last.fm only)
+curl "http://localhost:8787/__scheduled?cron=0+15+*+*+6"
 ```
 
-To run tests, run:
+To run tests:
 
 ```bash
 npx vitest
