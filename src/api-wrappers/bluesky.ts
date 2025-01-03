@@ -31,10 +31,19 @@ export class BlueSky {
         _: AtpSessionEvent,
         sessionData?: AtpSessionData,
       ) => {
-        await env.BLUESKY_SESSION_STORAGE.put(
-          SESSION_KEY,
-          JSON.stringify(sessionData),
-        );
+        const stringifiedSessionData = JSON.stringify(sessionData);
+
+        const existingSessionData =
+          await env.BLUESKY_SESSION_STORAGE.get(SESSION_KEY);
+
+        // Protect the number of writes we make to KV to avoid hitting the limits
+        // of Cloudflare's free tier.
+        if (existingSessionData !== stringifiedSessionData) {
+          await env.BLUESKY_SESSION_STORAGE.put(
+            SESSION_KEY,
+            JSON.stringify(sessionData),
+          );
+        }
       },
     });
   }
