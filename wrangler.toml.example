@@ -9,7 +9,7 @@ kv_namespaces = [
 [triggers]
 crons = [
   "* * * * *",      # Every minute for track sync
-  "0 10 * * 1"      # Every Monday at 10am EST for weekly top artists
+  "0 15 * * 6"      # Every Friday at 15:00 UTC for weekly top artists
 ]
 
 [observability.logs]
