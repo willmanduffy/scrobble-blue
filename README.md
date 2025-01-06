@@ -90,7 +90,24 @@ Note: The weekly top 5 artists feature currently only works with Last.fm. If bot
    ]
    ```
 
-5. Deploy secrets to Cloudflare:
+5. Configure settings (optional):
+   ```bash
+   cp settings.json.example settings.json
+   ```
+
+   The `settings.json` file allows you to customize various aspects of the application. If you're using VS Code, you'll get autocompletion and validation for the settings.
+
+   Available settings:
+   - `bio-now-playing-text`: The text prefix used for the "Now Playing" section in your bio (default: "🎵 Now playing:")
+
+   Example `settings.json`:
+   ```json
+   {
+     "bio-now-playing-text": "🎧 Currently vibing to: "
+   }
+   ```
+
+6. Deploy secrets to Cloudflare:
 
    ```bash
    wrangler secret put BSKY_USERNAME
@@ -104,7 +121,7 @@ Note: The weekly top 5 artists feature currently only works with Last.fm. If bot
    wrangler secret put LISTENBRAINZ_USERNAME
    ```
 
-6. Deploy the worker:
+7. Deploy the worker:
    ```bash
    wrangler deploy
    ```

@@ -173,3 +173,4 @@ dist
 .DS_Store
 
 wrangler.toml
+settings.json

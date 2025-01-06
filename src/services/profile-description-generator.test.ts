@@ -1,77 +1,108 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProfileDescriptionGenerator } from "./profile-description-generator";
-import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
-import { track } from "../../tests/fixtures/track";
+import { SettingsService } from "./settings";
+
+vi.mock("./settings", () => ({
+  SettingsService: {
+    getValue: vi.fn(),
+  },
+}));
 
 describe("ProfileDescriptionGenerator", () => {
-  it("should generate description with only now playing when no existing description", () => {
-    const generator = new ProfileDescriptionGenerator(undefined, track);
+  const mockTrack = {
+    name: "Test Song",
+    artist: "Test Artist",
+    timestamp: Date.now(),
+  };
 
-    expect(generator.call()).toBe('🎵 Now Playing: "Test Song" by Test Artist');
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("should append now playing to existing description", () => {
-    const profile: ProfileViewDetailed = {
-      did: "test-did",
-      handle: "test.handle",
-      description: "My cool profile",
-    } as ProfileViewDetailed;
+  it("should use custom now playing text from settings", async () => {
+    const customText = "🎧 Currently vibing to: ";
+    vi.mocked(SettingsService.getValue).mockResolvedValue(customText);
 
-    const generator = new ProfileDescriptionGenerator(profile, track);
+    const generator = await ProfileDescriptionGenerator.create(
+      undefined,
+      mockTrack,
+    );
+    const result = generator.call();
 
-    expect(generator.call()).toBe(
-      'My cool profile\n\n🎵 Now Playing: "Test Song" by Test Artist',
+    expect(result).toBe(`${customText}"Test Song" by Test Artist`);
+    expect(SettingsService.getValue).toHaveBeenCalledWith(
+      "bio-now-playing-text",
+      "🎵 Now Playing: ",
     );
   });
 
-  it("should update existing now playing section", () => {
-    const profile: ProfileViewDetailed = {
-      did: "test-did",
-      handle: "test.handle",
-      description:
-        'My cool profile\n\n🎵 Now Playing: "Old Song" by Old Artist',
-    } as ProfileViewDetailed;
+  it("should use default now playing text when settings return default", async () => {
+    const defaultText = "🎵 Now Playing: ";
+    vi.mocked(SettingsService.getValue).mockResolvedValue(defaultText);
 
-    const generator = new ProfileDescriptionGenerator(profile, track);
+    const generator = await ProfileDescriptionGenerator.create(
+      undefined,
+      mockTrack,
+    );
+    const result = generator.call();
 
-    expect(generator.call()).toBe(
-      'My cool profile\n\n🎵 Now Playing: "Test Song" by Test Artist',
+    expect(result).toBe(`${defaultText}"Test Song" by Test Artist`);
+    expect(SettingsService.getValue).toHaveBeenCalledWith(
+      "bio-now-playing-text",
+      defaultText,
     );
   });
 
-  it("should handle empty description", () => {
-    const profile: ProfileViewDetailed = {
-      did: "test-did",
-      handle: "test.handle",
-      description: "",
-    } as ProfileViewDetailed;
+  it("should preserve existing bio content", async () => {
+    const customText = "🎧 Currently vibing to: ";
+    vi.mocked(SettingsService.getValue).mockResolvedValue(customText);
 
-    const generator = new ProfileDescriptionGenerator(profile, track);
+    const existingBio = "I love music!\nCheck out my playlists";
+    const generator = await ProfileDescriptionGenerator.create(
+      { description: existingBio } as any,
+      mockTrack,
+    );
+    const result = generator.call();
 
-    expect(generator.call()).toBe('🎵 Now Playing: "Test Song" by Test Artist');
+    expect(result).toBe(
+      `I love music!\nCheck out my playlists\n\n${customText}"Test Song" by Test Artist`,
+    );
   });
 
-  it("should handle description with opening newlines and now playing", () => {
-    const profile: ProfileViewDetailed = {
-      did: "test-did",
-      handle: "test.handle",
-      description: "\n\n🎵 Now Playing: 'Old Song' by Old Artist",
-    } as ProfileViewDetailed;
+  it("should replace existing now playing section", async () => {
+    const customText = "🎧 Currently vibing to: ";
+    vi.mocked(SettingsService.getValue).mockResolvedValue(customText);
 
-    const generator = new ProfileDescriptionGenerator(profile, track);
+    const existingBio = `I love music!\n\n${customText} "Old Song" by Old Artist`;
+    const generator = await ProfileDescriptionGenerator.create(
+      { description: existingBio } as any,
+      mockTrack,
+    );
+    const result = generator.call();
 
-    expect(generator.call()).toBe('🎵 Now Playing: "Test Song" by Test Artist');
+    expect(result).toBe(
+      `I love music!\n\n${customText}"Test Song" by Test Artist`,
+    );
   });
 
-  it("should handle description with only now playing", () => {
-    const profile: ProfileViewDetailed = {
-      did: "test-did",
-      handle: "test.handle",
-      description: '🎵 Now Playing: "Old Song" by Old Artist',
-    } as ProfileViewDetailed;
+  it("should replace existing now playing section with different prefix", async () => {
+    const oldPrefix = "🎵 Now Playing: ";
+    const newPrefix = "🎧 Currently vibing to: ";
 
-    const generator = new ProfileDescriptionGenerator(profile, track);
+    vi.mocked(SettingsService.getValue).mockResolvedValue(newPrefix);
 
-    expect(generator.call()).toBe('🎵 Now Playing: "Test Song" by Test Artist');
+    const existingBio = `I love music!\n\n${oldPrefix}"Old Song" by Old Artist`;
+
+    const generator = await ProfileDescriptionGenerator.create(
+      { description: existingBio } as any,
+      mockTrack,
+    );
+
+    const result = generator.call();
+
+    // Should use the new prefix from settings
+    expect(result).toBe(
+      `I love music!\n\n${newPrefix}"Test Song" by Test Artist`,
+    );
   });
 });

@@ -1,13 +1,29 @@
 import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import { NormalizedTrack } from "../types/track";
+import { SettingsService } from "./settings";
 
 export class ProfileDescriptionGenerator {
-  private readonly NOW_PLAYING_MARKER = "🎵 Now Playing:";
+  private readonly defaultNowPlayingMarker = "🎵 Now Playing: ";
+  private readonly nowPlayingMarker: string;
 
-  constructor(
+  private constructor(
     private profile: ProfileViewDetailed | undefined,
     private track: NormalizedTrack,
-  ) {}
+    nowPlayingMarker: string,
+  ) {
+    this.nowPlayingMarker = nowPlayingMarker;
+  }
+
+  static async create(
+    profile: ProfileViewDetailed | undefined,
+    track: NormalizedTrack,
+  ): Promise<ProfileDescriptionGenerator> {
+    const marker = await SettingsService.getValue(
+      "bio-now-playing-text",
+      "🎵 Now Playing: ",
+    );
+    return new ProfileDescriptionGenerator(profile, track, marker);
+  }
 
   call(): string {
     // Normalize the existing description, handling undefined and normalizing line breaks
@@ -15,10 +31,16 @@ export class ProfileDescriptionGenerator {
       .replace(/\r\n/g, "\n")
       .replace(/\n\n+/g, "\n\n"); // Collapse multiple blank lines
 
-    // Find where the current "Now Playing" section starts
-    const nowPlayingIndex = existingDescription.indexOf(
-      this.NOW_PLAYING_MARKER,
+    // Find where any "Now Playing" section starts (either current or default marker)
+    const currentMarkerIndex = existingDescription.indexOf(
+      this.nowPlayingMarker,
     );
+
+    const defaultMarkerIndex = existingDescription.indexOf(
+      this.defaultNowPlayingMarker,
+    );
+
+    const nowPlayingIndex = Math.max(currentMarkerIndex, defaultMarkerIndex);
 
     // Get the base description, being careful with trimming
     let baseDescription =
@@ -33,7 +55,7 @@ export class ProfileDescriptionGenerator {
     const separator = baseDescription ? "\n\n" : "";
 
     // Construct the new description
-    const newDescription = `${baseDescription}${separator}${this.NOW_PLAYING_MARKER} "${this.track.name}" by ${this.track.artist}`;
+    const newDescription = `${baseDescription}${separator}${this.nowPlayingMarker}"${this.track.name}" by ${this.track.artist}`;
 
     // Add some logging to help debug issues
     console.info({

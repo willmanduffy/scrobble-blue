@@ -29,9 +29,9 @@ export class LatestTrackFetcher {
       latestTrackChecks.push(this.lastfm.getLatestSong());
     }
 
-    if (this.listenbrainz) {
-      latestTrackChecks.push(this.listenbrainz.getLatestSong());
-    }
+    // if (this.listenbrainz) {
+    //   latestTrackChecks.push(this.listenbrainz.getLatestSong());
+    // }
 
     const latestTracks = await Promise.all(latestTrackChecks);
 
