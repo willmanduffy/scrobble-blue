@@ -3,7 +3,7 @@
     "@cloudflare/workers-types": "^4.20250310.0",
     "prettier": "3.5.3",
     "typescript": "^5.8.2",
-    "vitest": "^3.0.7",
+    "vitest": "^3.0.8",
     "wrangler": "^3.112.0"
   },
   "dependencies": {
