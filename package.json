@@ -10,7 +10,7 @@
     "@atproto/api": "^0.15.14",
     "@imikailoby/lastfm-ts": "^2.0.1",
     "@kellnerd/listenbrainz": "npm:@jsr/kellnerd__listenbrainz@^0.8.4",
-    "workers-og": "^0.0.25"
+    "workers-og": "^0.0.27"
   },
   "scripts": {
     "test": "vitest run"
