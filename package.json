@@ -7,7 +7,7 @@
     "wrangler": "^4.33.1"
   },
   "dependencies": {
-    "@atproto/api": "^0.16.3",
+    "@atproto/api": "^0.16.6",
     "@imikailoby/lastfm-ts": "^2.0.1",
     "@kellnerd/listenbrainz": "npm:@jsr/kellnerd__listenbrainz@^0.8.4",
     "workers-og": "^0.0.27"
