@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260504.1",
+    "@cloudflare/workers-types": "^4.20260511.1",
     "prettier": "3.8.3",
     "typescript": "^6.0.3",
     "vitest": "^3.2.4",
